@@ -1,12 +1,14 @@
-# Kiwix Offline Library: Home Network Setup
+# Kiwix Offline Library Kit
 
-This kit turns the Linux Mint OptiPlex into an offline library server. Any laptop, tablet or phone on the home Wi-Fi can open it in a browser. It includes a kid-friendly encyclopedia and programming references, and nothing on it needs the internet once the files are downloaded.
+A ready-to-run offline library server for a home or classroom network. Any laptop, tablet or phone on the local Wi-Fi can open it in a browser. It ships with a kid-friendly encyclopedia and programming references, and nothing on it needs the internet once the content is downloaded.
 
 ```
- Kids' laptops / tablets ──Wi-Fi──► Router ──► OptiPlex (Linux Mint)
-                                               └─ Docker: kiwix-serve :8080
-                                                  └─ /srv/kiwix/zim/*.zim
+ Laptops / tablets ──Wi-Fi──► Router ──► Server (Linux)
+                                          └─ Docker: kiwix-serve :8080
+                                             └─ /srv/kiwix/zim/*.zim
 ```
+
+Tested on Linux Mint / Ubuntu / Debian. Should work on any systemd-based Linux distro with Docker support.
 
 ## What gets installed
 
@@ -18,10 +20,10 @@ This kit turns the Linux Mint OptiPlex into an offline library server. Any lapto
 
 Plan for about **5 GB** of disk space, plus room for extras.
 
-## 1. Prepare the OptiPlex (5 minutes)
+## 1. Prepare the server (5 minutes)
 
-1. **Give it a fixed address.** In your router's admin page, find *DHCP reservation* (sometimes called *static lease*) and reserve an IP for the OptiPlex. Without this, the address can change and the kids' bookmarks will break.
-2. **Copy this folder** to the OptiPlex, for example to `~/kiwix-server`.
+1. **Give it a fixed address.** In your router's admin page, find *DHCP reservation* (sometimes called *static lease*) and reserve an IP for this machine. Without this, the address can change and bookmarks will break.
+2. **Copy this folder** to the machine, for example to `~/kiwix-server`.
 
 ## 2. Install (one command)
 
@@ -43,10 +45,10 @@ When it finishes, it prints the address to use, for example:
 
 ```
 http://192.168.1.50:8080
-http://optiplex.local:8080
+http://<hostname>.local:8080
 ```
 
-## 3. Set up the kids' devices
+## 3. Set up client devices
 
 - Open the address in a browser and **bookmark it**, or set it as the home page.
 - On the Kiwix home page, each pack appears as a tile. The search box searches inside the open pack.
@@ -81,8 +83,8 @@ You can browse everything that's available at <https://library.kiwix.org>.
 ## Notes on child safety
 
 - Simple English Wikipedia and Vikidia are written for younger readers. The full English Wikipedia covers adult topics, so it's left out on purpose.
-- Kiwix is read-only, with no accounts, ads or chat. Browsing stays inside the packs you chose, although links to outside websites still work if the device itself has internet access.
-- Docker publishes port 8080 directly, which means `ufw` rules don't restrict it. Keep the OptiPlex behind your home router and don't forward port 8080 to the internet.
+- Kiwix is read-only, with no accounts, ads or chat. Browsing stays inside the packs you chose, although links to outside websites still work if the client device itself has internet access.
+- Docker publishes port 8080 directly, which means `ufw` rules don't restrict it. Keep the server behind your router/firewall and don't forward port 8080 to the internet.
 
 ## Troubleshooting
 
@@ -90,5 +92,13 @@ You can browse everything that's available at <https://library.kiwix.org>.
 |---|---|
 | `docker: permission denied` | Log out and back in (the installer added you to the `docker` group), or use `sudo`. |
 | A pack shows `WARN: No file matching…` | The prefix changed upstream. Run `--search <folder>` and update the line in `zims.conf`. |
-| The page won't load from another device | On the OptiPlex, check that `curl -I localhost:8080` works. Then check the IP address and that both devices are on the same Wi-Fi (not a guest network). |
+| The page won't load from another device | On the server, check that `curl -I localhost:8080` works. Then check the IP address and that both devices are on the same network (not a guest network/VLAN). |
 | Disk is filling up | Run `du -sh /srv/kiwix/zim/*` and comment out the big packs. The next update removes their old versions only, so delete unwanted files by hand. |
+
+## License
+
+MIT — see [LICENSE](LICENSE). The ZIM content itself is not part of this repo and carries its own licenses (mostly CC-BY-SA); see each project's site for details.
+
+## Contributing
+
+Issues and PRs welcome — additional content-pack suggestions, distro compatibility fixes, and documentation improvements are all useful.
